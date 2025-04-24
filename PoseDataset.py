@@ -1,3 +1,4 @@
+
 import os
 import pandas as pd
 from PIL import Image
@@ -47,9 +48,13 @@ class PoseDataset(Dataset):
         self.filenames = os.listdir(image_folder)
         self.filenames.sort()
 
+        # --- New: Remove rows where any bbox value is NaN ---
+        bbox_cols = [col for col in self.labels.columns if col.startswith("bbox_")]
+        self.labels = self.labels.dropna(subset=bbox_cols).reset_index(drop=True)
+
         # bbox
         df = self.labels.copy()
-        self.bbox = df[[col for col in df.columns if col.startswith("bbox_")]]
+        self.bbox = df[bbox_cols]
         
         # keypoints
         df = df.drop(columns=[col for col in df.columns if col.startswith("bbox_")])
@@ -87,6 +92,15 @@ class PoseDataset(Dataset):
 
         img_name = self.filenames[idx]
 
+        # Check if the image has a matching annotation in the labels
+        matches = self.labels[self.labels['filename'] == img_name]
+        
+        if len(matches) == 0:
+            # Print the image name that caused the issue
+            print(f"Warning: No annotation found for image: {img_name}")
+            # Optionally, raise an exception or return None if you want to stop the process here
+            return None
+
         idx = self.labels[self.labels['filename'] == img_name].index[0]
 
         bbox = self.bbox.iloc[idx,:].to_numpy()
@@ -109,7 +123,7 @@ class PoseDataset(Dataset):
         if len(valid_keypoints) == 0:
             raise ValueError("All keypoints are NaN for this sample.")
         transformed_image = transformed_image.crop(bbox)
-
+      
         # plt.figure()
         # plt.imshow(transformed_image.permute(1, 2, 0))
         # plt.title('1')
@@ -191,7 +205,7 @@ class PoseDataset(Dataset):
                                        heatmap_size=self.heatmap_size, sigma=0.8)
             heatmaps.append(heatmap)
 
-        heatmaps = torch.stack(heatmaps)
+        heatmaps = torch.stack(heatmaps).unsqueeze(0)
 
         return transformed_image, keypoints, heatmaps
 
@@ -252,8 +266,8 @@ def generate_heatmap(image, keypoint, padding_width, padding_height, heatmap_siz
 
 if __name__ == "__main__":
     # Set paths
-    image_folder = r"datasets\topv11\images"
-    label_file = r"datasets\topv11\annotations.csv"
+    image_folder = r"C:\Users\giouv\bnl-ai\Mouse_Project\images\default"
+    label_file = r"C:\Users\giouv\bnl-ai\Mouse_Project\annotations.csv"
 
     # Create dataset and data loader
     dataset = PoseDataset(image_folder=image_folder,

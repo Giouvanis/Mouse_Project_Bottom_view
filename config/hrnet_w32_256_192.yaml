@@ -1,8 +1,8 @@
 MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
-  NUM_JOINTS: 17
-  PRETRAINED: 'data/hrnet_w32-36af842e.pth'
+  NUM_JOINTS: 12
+  PRETRAINED: ''
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
   - 192

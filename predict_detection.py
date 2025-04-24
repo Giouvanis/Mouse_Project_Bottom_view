@@ -1,3 +1,4 @@
+
 from ultralytics import YOLO
 import os
 
@@ -15,7 +16,7 @@ def list_filenames(folder_path):
 
 if __name__ == '__main__':
     # Load a model
-    model = YOLO(r"runs\detect\first\weights\best.pt")  # pretrained YOLO11n model
+    model = YOLO(r"C:/Users/giouv/Downloads/yolo11l.pt")  # pretrained YOLO11n model
 
     filenames = list_filenames(r'datasets\top_detection_v1\images\val')
 

@@ -1,0 +1,31 @@
+MODEL:
+  NAME: "pose_hrnet"
+  NUM_JOINTS: 14
+  IMAGE_SIZE: [256, 256]
+  HEATMAP_SIZE: [64, 64]
+ PRETRAINED: "C:/Users/giouv/bnl-ai/models/hrnet_w32-36af842e.pth" 
+INIT_WEIGHTS: True
+  EXTRA:
+    PRETRAINED_LAYERS: ['*']
+    FINAL_CONV_KERNEL: 1
+    STAGE2:
+      NUM_MODULES: 1
+      NUM_BRANCHES: 2
+      BLOCK: "BASIC"
+      NUM_BLOCKS: [4, 4]
+      NUM_CHANNELS: [32, 64]
+      FUSE_METHOD: SUM
+    STAGE3:
+      NUM_MODULES: 4
+      NUM_BRANCHES: 3
+      BLOCK: "BASIC"
+      NUM_BLOCKS: [4, 4, 4]
+      NUM_CHANNELS: [32, 64, 128]
+      FUSE_METHOD: SUM
+    STAGE4:
+      NUM_MODULES: 3
+      NUM_BRANCHES: 4
+      BLOCK: "BASIC"
+      NUM_BLOCKS: [4, 4, 4, 4]
+      NUM_CHANNELS: [32, 64, 128, 256]
+      FUSE_METHOD: SUM
